@@ -12,8 +12,12 @@ build_vips() {
     apt install build-essential pkg-config libglib2.0-dev libexpat1-dev meson
     pushd /home/yunohost.app/peertube/
     vips_pkg_name=vips-${vips_version}
-    ynh_hide_warnings ynh_exec_as_app wget https://github.com/libvips/libvips/releases/download/v${vips_version}/${vips_pkg_name}.tar.xz
-    ynh_hide_warnings ynh_exec_as_app tar -xf ${vips_pkg_name}.tar.xz
+    # don't download it twice
+    if [[ ! -d ${vips_pkg_name} ]]
+    then
+	ynh_hide_warnings ynh_exec_as_app wget https://github.com/libvips/libvips/releases/download/v${vips_version}/${vips_pkg_name}.tar.xz
+	ynh_hide_warnings ynh_exec_as_app tar -xf ${vips_pkg_name}.tar.xz
+    fi
     pushd  ${vips_pkg_name}
     ynh_hide_warnings ynh_exec_as_app meson setup build
     pushd build
