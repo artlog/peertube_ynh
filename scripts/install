@@ -46,7 +46,12 @@ ynh_psql_db_shell <<< "CREATE EXTENSION IF NOT EXISTS pg_trgm;"
 ynh_script_progression "Building $app..."
 
 pushd "$install_dir"
-	ynh_hide_warnings ynh_exec_as_app pnpm install --frozen-lockfile
+	ynh_script_progression "Building sharp from source..."
+	vips_version=8.17.3
+	build_vips
+	ynh_hide_warnings ynh_exec_as_app pnpm add --workspace-root --no-lockfile --prod node-addon-api node-gyp
+	ynh_hide_warnings ynh_exec_as_app SHARP_FORCE_GLOBAL_LIBVIPS=1 npm explore sharp -- npm run build
+	ynh_hide_warnings ynh_exec_as_app pnpm install
 	ynh_hide_warnings ynh_exec_as_app pnpm store prune
 popd
 
