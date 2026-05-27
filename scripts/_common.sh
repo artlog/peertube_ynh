@@ -15,11 +15,15 @@ build_vips() {
     # don't download it twice
     if [[ ! -d ${vips_pkg_name} ]]
     then
-	ynh_hide_warnings ynh_exec_as_app wget https://github.com/libvips/libvips/releases/download/v${vips_version}/${vips_pkg_name}.tar.xz
+	if [[ ! -e ${vips_pkg_name}.tar.xz ]]
+	then
+	    ynh_hide_warnings ynh_exec_as_app wget https://github.com/libvips/libvips/releases/download/v${vips_version}/${vips_pkg_name}.tar.xz
+	fi
 	ynh_hide_warnings ynh_exec_as_app tar -xf ${vips_pkg_name}.tar.xz
     fi
     pushd  ${vips_pkg_name}
-    ynh_hide_warnings ynh_exec_as_app meson setup build
+    # override system libraries... ( default is /usr/local )
+    ynh_hide_warnings ynh_exec_as_app meson setup build --prefix /usr
     pushd build
     ynh_hide_warnings ynh_exec_as_app meson compile
     # FIXME it fails in tests ... should fix, missing libraries ?
